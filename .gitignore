@@ -1,0 +1,14 @@
+# Ignore system directories
+AppData/
+*.log
+.DS_Store
+# Ignore system files and unnecessary folders
+AppData/
+NTUSER.DAT*
+*.log
+*.mp4
+OneDrive/
+Downloads/
+.vscode/
+.gitconfig
+*.tgz
