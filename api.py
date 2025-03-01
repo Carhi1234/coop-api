@@ -1,14 +1,23 @@
 from fastapi import FastAPI
 import gspread
+import json
+import os
 from google.oauth2.service_account import Credentials
 
-# Authenticate with Google Sheets API
+# Authenticate with Google Sheets API using environment variable
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
+creds_json = os.getenv("GOOGLE_CREDENTIALS")
+
+if creds_json:
+    creds_dict = json.loads(creds_json)  # Load JSON string as dictionary
+    creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+else:
+    raise FileNotFoundError("GOOGLE_CREDENTIALS environment variable not found")
+
 client = gspread.authorize(creds)
 
 # Open your Google Sheet
-SPREADSHEET_ID = "your_google_sheet_id_here"  # Change this to your actual Google Sheet ID
+SPREADSHEET_ID = "1ohAvRaQbmlCkXNtC4QFEMT0HdYxy5uFNPGujrAoooD8"  # Change this to your actual Google Sheet ID
 worksheet = client.open_by_key(SPREADSHEET_ID).sheet1
 
 # Create FastAPI app
