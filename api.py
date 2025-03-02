@@ -66,21 +66,40 @@ def search_companies(
 
 # Endpoint to Add a New Company
 @app.post("/companies")
-def add_company(
-    company_name: str, industry: str, location: str, contact_name: str,
-    contact_email: str, contact_phone: str, company_website: str,
-    open_positions: int, job_description: str, required_skills: str,
-    preferred_skills: str, salary: float, application_deadline: str,
-    internship_duration: str, additional_notes: str
-):
+def add_company(company_data: dict):
     try:
-        new_entry = [
-            company_name, industry, location, contact_name, contact_email,
-            contact_phone, company_website, open_positions, job_description,
-            required_skills, preferred_skills, salary, application_deadline,
-            internship_duration, additional_notes
-        ]
-        worksheet.append_row(new_entry)  # Add row to sheet
-        return {"message": f"Company '{company_name}' added successfully!"}
+        print("Received Data:", company_data)  # Debugging line
+
+        # Extract fields from received JSON
+        company_name = company_data.get("company_name", "")
+        industry = company_data.get("industry", "")
+        location = company_data.get("location", "")
+        contact_name = company_data.get("contact_name", "")
+        contact_email = company_data.get("contact_email", "")
+        contact_phone = company_data.get("contact_phone", "")
+        company_website = company_data.get("company_website", "")
+        open_positions = company_data.get("open_positions", 0)
+        job_description = company_data.get("job_description", "")
+        required_skills = company_data.get("required_skills", "")
+        preferred_skills = company_data.get("preferred_skills", "")
+        salary = company_data.get("salary", 0)
+        application_deadline = company_data.get("application_deadline", "")
+        internship_duration = company_data.get("internship_duration", "")
+        additional_notes = company_data.get("additional_notes", "")
+
+        # Ensure required fields are present
+        if not company_name or not industry or not location:
+            return {"error": "Missing required fields: company_name, industry, location"}
+
+        # Append data to Google Sheets
+        worksheet.append_row([
+            company_name, industry, location, contact_name, contact_email, contact_phone,
+            company_website, open_positions, job_description, required_skills, preferred_skills,
+            salary, application_deadline, internship_duration, additional_notes
+        ])
+
+        return {"message": f"Company {company_name} added successfully!"}
+
     except Exception as e:
         return {"error": str(e)}
+
