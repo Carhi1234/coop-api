@@ -22,7 +22,7 @@ creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # Open the Google Sheet
-SPREADSHEET_ID = "1ohAvRaQbmLCXWxC4QEFtMHDwXySuFPNGujAoooD8"  # Replace with your Google Sheet ID
+SPREADSHEET_ID = "1ohAvRaQbmlCkXNtC4QFEMT0HdYxy5uFNPGujrAoooD8"  # Replace with your Google Sheet ID
 worksheet = client.open_by_key(SPREADSHEET_ID).sheet1
 
 # Initialize FastAPI
