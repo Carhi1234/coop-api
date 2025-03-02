@@ -1,41 +1,37 @@
-from fastapi import FastAPI
-import gspread
-import json
 import os
+import json
+import gspread
+from fastapi import FastAPI
 from google.oauth2.service_account import Credentials
 
-# Authenticate with Google Sheets API using environment variable
+# Load Google Credentials from environment variable
+creds_json = os.getenv("GOOGLE_CREDENTIALS")  # Read JSON as a string
+if not creds_json:
+    raise ValueError("Missing GOOGLE_CREDENTIALS environment variable")
+
+# Convert JSON string to dictionary
+creds_dict = json.loads(creds_json)
+
+# Authenticate with Google Sheets API
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-creds_json = os.getenv("GOOGLE_CREDENTIALS")
-
-if creds_json:
-    creds_dict = json.loads(creds_json)  # Load JSON string as dictionary
-    creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
-else:
-    raise FileNotFoundError("GOOGLE_CREDENTIALS environment variable not found")
-
+creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Open your Google Sheet
-SPREADSHEET_ID = "1ohAvRaQbmlCkXNtC4QFEMT0HdYxy5uFNPGujrAoooD8"  # Change this to your actual Google Sheet ID
-worksheet = client.open_by_key(SPREADSHEET_ID).sheet1
+# Open the Google Sheet
+SPREADSHEET_ID = "1ohAvRaQbmlCkXNtC4QFEMT0HdYxy5uFNPGujrAoooD8"  # Replace with your actual Google Sheet ID
+worksheet = client.open_by_key(SPREADSHEET_ID).sheet1  # Open first sheet
 
-# Create FastAPI app
+# Initialize FastAPI
 app = FastAPI()
 
-# Endpoint to get all students looking for co-ops
+# Endpoint to Read All Students from the Sheet
 @app.get("/students")
 def get_students():
     data = worksheet.get_all_records()
     return {"students": data}
 
-# Endpoint to add a new student
+# Endpoint to Add a New Student
 @app.post("/students")
 def add_student(name: str, field: str, availability: str):
-    worksheet.append_row([name, field, availability])
+    worksheet.append_row([name, field, availability])  # Add row to sheet
     return {"message": f"Student {name} added successfully!"}
-
-# Run the API (for local testing)
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
