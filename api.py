@@ -33,9 +33,12 @@ app = FastAPI()
 def get_students():
     try:
         data = worksheet.get_all_records()
+        print("DEBUG: Retrieved data:", data)  # Check what's returned in logs
         return {"students": data}
     except Exception as e:
+        print("ERROR: Failed to read data:", str(e))  # Log the error
         return {"error": str(e)}
+
 
 # Endpoint to Add a New Student
 @app.post("/students")
