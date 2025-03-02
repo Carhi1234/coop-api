@@ -32,7 +32,7 @@ app = FastAPI()
 @app.get("/students")
 def get_students():
     try:
-        data = worksheet.get_all_records()
+       data = worksheet.get_values("A1:Z")  # Reads all rows in range A1 to last column
         print("DEBUG: Retrieved data:", data)  # Check what's returned in logs
         return {"students": data}
     except Exception as e:
