@@ -38,12 +38,25 @@ FIELD_NAMES = [
 
 # Endpoint to Read All Companies from the Sheet
 @app.get("/companies")
-def get_companies():
+def search_companies(query: Optional[str] = Query(None, description="Search term for any company field")):
     try:
-        data = worksheet.get_all_records()
-        return {"companies": data}
+        data = worksheet.get_all_records()  # Fetch all data
+
+        if query:
+            query = query.lower()  # Normalize input for case-insensitive search
+
+            # Filter companies where ANY field contains the search term
+            filtered_data = [
+                row for row in data if any(query in str(value).lower() for value in row.values())
+            ]
+        else:
+            filtered_data = data  # No filter, return all
+        
+        return {"companies": filtered_data}
+    
     except Exception as e:
         return {"error": str(e)}
+
 
 # Endpoint to Search for Companies (By Industry, Location, or Salary)
 @app.get("/search")
